@@ -4,7 +4,7 @@ import { signin, signout, signup } from "../controllers/auth.controller.js";
 
 const authrouter = express.Router();
 
-authrouter.get("/signup" , signup );
+authrouter.post("/signup" , signup );
 
 authrouter.get("/signin" , signin );
 
