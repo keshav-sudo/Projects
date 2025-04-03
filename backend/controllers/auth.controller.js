@@ -21,7 +21,20 @@ export const signup = async(req , res)=>{
 
         const { fullname , username , email , password } = req.body;
 
-        const existinguser = await User.findOne({username})
+        const existinguser = await User.findOne({username});
+        if(existinguser){
+            res.status(400).json({
+                error : "user alreday exist"
+            })
+        }
+        const existingemail = await User.findOne({email});
+        if(existingemail){
+            res.status(400).json({
+                error : "email alreday exist"
+            })
+        }
+
+
     } catch (error) {
         res.status(500).json({
             message : `there is some error ${error}` 
