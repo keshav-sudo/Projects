@@ -1,15 +1,18 @@
 import User from "../models/user.model.js";
 import z from "zod";
+import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import jwt from  "jsonwebtoken";
+import { generateTokenAndSetCookie } from "../lib/utlis/generatetoken.js";
 
 export const signup = async(req , res)=>{
       
     const signupSchema = z.object({
         username: z.string().min(3),
         fullname: z.string().min(3),
-        password: z.string().min(6),
-        email: z.string().email()
+        email: z.string().email(),
+        password: z.string().min(6)
+        
     })
 
     try {
@@ -33,21 +36,94 @@ export const signup = async(req , res)=>{
                 error : "email alreday exist"
             })
         }
+        
+        if (password.length < 6) {
+			return res.status(400).json({ error: "Password must be at least 6 characters long" });
+		}
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedpassword = await bcrypt.hash(password, salt);
+
+        const newUser = new User ({
+            username,
+            fullname,
+            email,
+            password: hashedpassword,
+        });
+
+        if(newUser){
+            generateTokenAndSetCookie(newUser._id , res);
+            await newUser.save();
+
+            res.status(201).json({
+                _id: newUser._id,
+                fullname: newUser.fullname,
+				username: newUser.username,
+				email: newUser.email,
+				followers: newUser.followers,
+				following: newUser.following,
+				profileImg: newUser.profileImg,
+				coverImg: newUser.coverImg,
+                
+            });
+        }else{
+            res.status(400).json({ error : "Invalid user data"})
+        }
 
 
     } catch (error) {
-        res.status(500).json({
-            message : `there is some error ${error}` 
-        })
+        console.log("Error in signup controller", error.message);
+		res.status(500).json({ error: "Internal Server Error" });
     }
-}
+};
 
-export const signin = (req , res)=>{
-    res.json({
-        data : "you hit the signin endpoint"
-    })
+export const signin = async (req , res)=>{
+   try {
+    const {username , password} = req.body;
+    const user = await User. findOne({username});
+    const isPasswordcorrect = await bcrypt.compare(password, user?.password || "");
+
+    
+    if(!user || !isPasswordcorrect){
+        return res.status(400).json({error: "Invailid username or password"})
+    }
+
+    generateTokenAndSetCookie(user._id, res);
+
+    res.status(200).json({
+			_id: user._id,
+			fullname: user.fullname,
+			username: user.username,
+			email: user.email,
+			followers: user.followers,
+			following: user.following,
+			profileImg: user.profileImg,
+			coverImg: user.coverImg,
+    });
+
+   } catch (error) {
+        console.log("Error in login controller", error.message);
+		res.status(500).json({ error: "Internal Server Error" });
+   }
 }
 
 export const signout =  (req, res)=>{
-    res.send("you hit logout end point")
+  try {
+    res.cookie("jwt", "", {maxAge : 0});
+    res.status(200).json({message  : "Logged out succesfully"});
+  } catch (error) {
+    console.log("Error in logout controller", error.message );
+    res.status(500).json({error : "Internal server error"})
+  }
 };
+
+
+export const getme = async (req , res)=> {
+    try {
+        const user = await User.findById(req.user._id).select("-password");
+        res.status(200).json(user);
+    } catch (error) {
+        console.log("Error in getMe controller", error.message);
+		res.status(500).json({ error: "Internal Server Error" });
+    }
+}

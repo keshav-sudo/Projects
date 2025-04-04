@@ -1,13 +1,16 @@
 import mongoose from "mongoose";
 import express from "express";
-import { signin, signout, signup } from "../controllers/auth.controller.js";
+import { getme, signin, signout, signup } from "../controllers/auth.controller.js";
+import { protect } from "../middleware/protect.js";
 
 const authrouter = express.Router();
 
 authrouter.post("/signup" , signup );
 
-authrouter.get("/signin" , signin );
+authrouter.post("/signin" , signin );
 
 authrouter.get("/logout" ,signout);
+
+authrouter.get("/getme" ,protect, getme ); 
 
 export default authrouter;
