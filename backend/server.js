@@ -3,6 +3,7 @@ import authRouter from "./routes/auth.Routes.js";
 import dotenv from "dotenv";
 import { connectdb } from "./db/connectmongo.js";
 import cookieParser from "cookie-parser"
+import postRouter from "./routes/post.Routes.js";
 const app = express();
 app.use(cookieParser());
 
@@ -22,6 +23,7 @@ console.log("MONGO_URI:", MONGO_URI); // Debugging
 
 
 app.use("/api/auth", authRouter);
+app.use("/api/post", postRouter);
 app.get("/", (req, res) => {
     res.send("Server is ready");
 });

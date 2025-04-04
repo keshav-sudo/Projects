@@ -79,6 +79,16 @@ export const signup = async(req , res)=>{
 
 export const signin = async (req , res)=>{
    try {
+
+    const loginSchema = z.object({
+        username : z.string().min(3),
+        password : z.string().min(6)
+    })
+
+    const result = loginSchema.safeParse(req.body);
+    if(!result.success){
+        return res.status(422).json({messgae : "zod validation failed"})
+    }
     const {username , password} = req.body;
     const user = await User. findOne({username});
     const isPasswordcorrect = await bcrypt.compare(password, user?.password || "");
