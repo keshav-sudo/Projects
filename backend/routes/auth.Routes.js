@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import express from "express";
 import { getme, signin, signout, signup } from "../controllers/auth.controller.js";
 import { protect } from "../middleware/protect.js";
@@ -13,4 +12,4 @@ authrouter.get("/logout" ,signout);
 
 authrouter.get("/getme" ,protect, getme ); 
 
-export default authrouter;
+export default authrouter;  
