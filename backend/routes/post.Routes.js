@@ -8,10 +8,4 @@ const postRouter = express.Router();
 postRouter.post("/create", protect, upload.single("Img"), createPost);
 postRouter.get("/getall" ,  getallpost);
 postRouter.delete("/:id" ,protect, deletePost )
-postRouter.get("/comment" , commentOnPost  )
-postRouter.get("/likeunlike" , likeunlikepost  )
-postRouter.get("/getliked" , getlikedpost  )
-postRouter.get("/following" , getfollowingpost )
-postRouter.get("/user" ,  getuserpost)
-
 export default postRouter;

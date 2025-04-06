@@ -109,36 +109,3 @@ export const deletePost = async (req , res) =>{
 
 
 
-export const commentOnPost = async (req , res)=>{
-    res.send("hit comment route")
-}
-
-
-
-
-
-
-export const likeunlikepost = async (req , res)=>{
-    res.send("hit comment route")
-}
-
-
-
-
-
-
-
-
-
-export const getlikedpost = async (req , res)=>{
-    res.send("hit comment route")
-}
-
-
-export const getfollowingpost = async (req , res)=>{
-    res.send("hit comment route")
-}
-
-export const getuserpost= async (req , res)=>{
-    res.send("hit comment route")
-}
